@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meu Studio Personal Training</title>
+<meta name="description" content="Meu Studio Personal Training. O caminho pode ser tão bonito quanto a chegada. Seu treino, seu ritmo.">
+<meta name="theme-color" content="#0a0707">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap">
+<style>
+/* Layout: uma jornada guiada pelo batimento. Canvas fixo de brasas no topo, depois uma trilha que nasce como eletrocardiograma e desce a página. */
+:root{
+  --bg:#0a0707;
+  --surface:#140e0c;
+  --ink:#f6efe9;
+  --muted:#a8978d;
+  --line:rgba(255,160,74,.14);
+  --o:#ff5a1f;
+  --o2:#ffa04a;
+  --pulse:0;
+
+  --f-title:"Anton","Impact","Arial Narrow",sans-serif;
+  --f-quote:"Playfair Display","Georgia",serif;
+  --f-body:"Inter","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,p{margin:0}
+h2{text-wrap:balance}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--o2);outline-offset:3px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* CARREGAMENTO */
+.loader{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:var(--bg)}
+.js .loader{display:grid}
+.loader.done{opacity:0;visibility:hidden;transition:opacity .6s ease .15s,visibility 0s .8s}
+.ld{display:grid;justify-items:center;gap:26px}
+.ring{position:relative;width:172px;height:172px;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.ring::before{content:"";position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,rgba(255,90,31,.55),transparent 70%);filter:blur(18px);animation:breathe 1.8s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.25);opacity:.7}}
+.ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring .trk{fill:none;stroke:var(--line);stroke-width:5}
+.ring .bar{fill:none;stroke:url(#ldg);stroke-width:5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1}
+.ring .dash{fill:none;stroke:var(--o);stroke-width:1.5;stroke-dasharray:2 9;opacity:.5;transform-origin:50% 50%;animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.core{position:absolute;inset:26px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;text-align:center}
+.core b{font-family:var(--f-title);font-weight:400;font-size:46px;line-height:.9;font-variant-numeric:tabular-nums}
+.core small{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.ld p{font-family:var(--f-quote);font-style:italic;font-size:19px;color:var(--muted);text-align:center;padding-inline:16px}
+.loader.done .ring{transform:scale(1.15)}
+@media (prefers-reduced-motion:reduce){.ring::before,.ring .dash{animation:none}}
+
+/* brilho de fundo que pulsa */
+.bgglow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(70% 45% at 50% 105%,rgba(255,90,31,.26),transparent 70%);opacity:calc(.35 + var(--pulse) * .65);will-change:opacity}
+
+/* CABEÇALHO */
+.top{position:fixed;inset:0 0 auto;z-index:30;padding-top:env(safe-area-inset-top,0px);background:rgba(10,7,7,.94);border-bottom:1px solid rgba(255,160,74,.08)}
+.top .in{height:68px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1320px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo .ms{width:38px;height:38px;border-radius:9px;background:var(--o);color:var(--bg);display:grid;place-items:center;font-family:var(--f-title);font-size:18px;letter-spacing:.02em;flex:none}
+.logo b{font-weight:600;font-size:16px;letter-spacing:.01em;white-space:nowrap}
+.logo small{display:block;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;line-height:1.2}
+@media (max-width:420px){.logo small{display:none}}
+
+/* BOTÕES */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font-family:var(--f-body);font-weight:600;font-size:16px;border-radius:999px;padding:15px 28px;border:0;cursor:pointer;white-space:nowrap}
+.btn svg{width:19px;height:19px;flex:none}
+.btn-main{background:linear-gradient(135deg,var(--o2),var(--o));color:var(--bg);transform:scale(calc(1 + var(--pulse) * .045));box-shadow:0 0 calc(10px + var(--pulse) * 38px) rgba(255,90,31,calc(.28 + var(--pulse) * .45))}
+.btn-main:hover{filter:brightness(1.08)}
+.btn-sm{padding:10px 18px;font-size:14.5px}
+
+/* BPM */
+.bpm{position:fixed;z-index:30;left:calc(14px + env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;padding:8px 14px 8px 12px;border-radius:14px;background:rgba(20,14,12,.94);border:1px solid var(--line)}
+.bpm svg{width:24px;height:24px;fill:var(--o);transform:scale(calc(1 + var(--pulse) * .28));filter:drop-shadow(0 0 calc(var(--pulse) * 8px) var(--o))}
+.bpm b{font-family:var(--f-title);font-weight:400;font-size:28px;line-height:1;font-variant-numeric:tabular-nums;min-width:1.75em}
+.bpm small{font-size:10.5px;letter-spacing:.14em;color:var(--muted);line-height:1.15}
+
+/* PRIMEIRA PÁGINA */
+.hero{position:relative;height:460vh;z-index:1}
+.stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+#fx{position:absolute;inset:0;width:100%;height:100%;display:block}
+.caps{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 9vh);padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));height:150px;pointer-events:none}
+.cap{position:absolute;left:0;right:0;bottom:0;padding-inline:inherit;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px;font-family:var(--f-quote);font-style:italic;font-size:clamp(22px,3.1vw,38px);line-height:1.2;transform-origin:50% 100%;transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.cap p{max-width:22em;text-wrap:balance}
+.js .cap{opacity:0;transform:perspective(700px) rotateX(70deg) translateY(30px)}
+.js .cap.on{opacity:1;transform:none}
+.js .cap.on .btn{pointer-events:auto}
+.cap .btn{font-style:normal}
+.ticks{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 9vh - 34px);display:flex;gap:8px}
+.ticks i{width:22px;height:3px;border-radius:3px;background:rgba(255,160,74,.22);transition:background .4s ease,width .4s ease}
+.ticks i.on{background:var(--o);width:36px}
+.hint{position:absolute;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 22px);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;transition:opacity .5s ease}
+.hint span{display:block;width:1px;height:28px;background:linear-gradient(var(--o),transparent);animation:drip 1.6s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (max-width:760px){.caps{bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}.ticks{bottom:calc(env(safe-area-inset-bottom,0px) + 76px)}.hint{display:none}}
+
+/* JORNADA */
+.journey{position:relative;z-index:1}
+.trail{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.trail path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.trail .base{stroke:rgba(255,160,74,.16);stroke-width:2}
+.trail .halo{stroke:rgba(255,90,31,.22);stroke-width:9}
+.trail .lit{stroke:var(--o);stroke-width:2.5}
+.jw{position:relative;max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (max-width:1179px){.jw{padding-left:max(58px,env(safe-area-inset-left,0px))}}
+
+.lbl{font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--o2)}
+.h2{font-family:var(--f-title);font-weight:400;text-transform:uppercase;font-size:clamp(50px,7.2vw,100px);line-height:.92;letter-spacing:.005em;margin-top:14px}
+.h2 em{font-family:var(--f-quote);font-style:italic;font-weight:400;text-transform:none;color:var(--o);letter-spacing:-.01em}
+
+/* revelação */
+.js .rv{opacity:0;transform:perspective(900px) rotateX(22deg) translateY(44px);transform-origin:50% 100%;transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--d,0) * 120ms)}
+.js .lit .rv{opacity:1;transform:none}
+
+/* intro com o ECG */
+.intro .jw{display:grid;grid-template-columns:minmax(0,1fr) 220px minmax(0,1fr);align-items:center;padding-block:22vh 18vh}
+.intro .l{font-family:var(--f-title);text-transform:uppercase;font-size:clamp(46px,5.6vw,80px);line-height:.94;text-align:right}
+.intro .l span{color:var(--o)}
+.intro .r{grid-column:3;font-family:var(--f-quote);font-style:italic;font-size:clamp(22px,2.4vw,30px);line-height:1.3;color:var(--muted)}
+.intro .r b{color:var(--ink);font-weight:400}
+@media (max-width:1179px){
+  .intro .jw{grid-template-columns:1fr;gap:28px;padding-block:16vh 12vh}
+  .intro .l{text-align:left}
+  .intro .r{grid-column:1}
+}
+
+/* serviços */
+.sec .jw{padding-block:120px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:56px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:30px 28px 32px;display:flex;flex-direction:column;gap:14px;min-width:0;transition:border-color .3s ease}
+.card:hover{border-color:rgba(255,90,31,.55)}
+.card svg{width:46px;height:46px;stroke:var(--o);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.card h3{font-family:var(--f-title);font-weight:400;text-transform:uppercase;font-size:32px;line-height:1;letter-spacing:.01em;margin-top:8px}
+.card p{color:var(--muted);font-size:16px}
+@media (max-width:860px){.cards{grid-template-columns:1fr}}
+
+/* avaliações */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:56px}
+.stat{border-top:1px solid var(--line);padding-top:22px;min-width:0}
+.stat b{display:block;font-family:var(--f-title);font-weight:400;font-size:clamp(76px,10vw,140px);line-height:.95;background:linear-gradient(180deg,var(--o2),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat .st{color:var(--o2);letter-spacing:4px;font-size:15px;display:block;margin-top:10px}
+.stat p{color:var(--muted);margin-top:6px;font-size:16px}
+.note{margin-top:40px;color:var(--muted);font-size:15px}
+.note a{color:var(--o2);font-weight:500}
+@media (max-width:760px){.stats{grid-template-columns:1fr;gap:8px}.stat{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:20px;align-items:center}.stat b{grid-row:span 2;font-size:76px}.stat .st{margin-top:0}}
+
+/* contato */
+.contact .jw{padding-block:120px 140px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.finish{width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,160,74,.3);display:grid;place-items:center;margin-bottom:34px;transition:border-color .6s ease,box-shadow .6s ease}
+.finish i{width:14px;height:14px;border-radius:50%;background:rgba(255,160,74,.3);transition:background .6s ease}
+.finish.arrived{border-color:var(--o);box-shadow:0 0 calc(14px + var(--pulse) * 40px) rgba(255,90,31,.55)}
+.finish.arrived i{background:var(--o2)}
+.contact p.t{margin-top:22px;color:var(--muted);font-size:18px;max-width:30em}
+.contact .btn{margin-top:36px;font-size:17px;padding:18px 34px}
+.contact .sig{margin-top:26px;font-family:var(--f-quote);font-style:italic;font-size:20px;color:var(--o2)}
+@media (max-width:1179px){.contact .jw{align-items:flex-start;text-align:left}}
+
+/* rodapé */
+footer{position:relative;z-index:1;border-top:1px solid var(--line)}
+footer .jw{padding-block:32px calc(96px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;color:var(--muted);font-size:14px}
+footer .q{font-family:var(--f-quote);font-style:italic;color:var(--ink);font-size:17px}
+
+@media (prefers-reduced-motion:reduce){
+  .cap,.js .rv,.ticks i,.finish,.card{transition:none}
+  .js .rv{opacity:1;transform:none}
+  .hint span{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader" role="status" aria-label="Carregando">
+  <div class="ld">
+    <div class="ring">
+      <svg viewBox="0 0 172 172" aria-hidden="true">
+        <defs><linearGradient id="ldg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffa04a"/><stop offset="1" stop-color="#ff5a1f"/></linearGradient></defs>
+        <circle class="dash" cx="86" cy="86" r="82"/>
+        <circle class="trk" cx="86" cy="86" r="72"/>
+        <circle class="bar" id="ldbar" cx="86" cy="86" r="72" pathLength="1"/>
+      </svg>
+      <div class="core"><div><b id="ldpct">0</b><small>por cento</small></div></div>
+    </div>
+    <p id="ldmsg">Preparando o seu caminho</p>
+  </div>
+</div>
+
+<div class="bgglow" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="in">
+    <a class="logo" href="#inicio" aria-label="Meu Studio Personal Training, início">
+      <span class="ms" aria-hidden="true">MS</span>
+      <span><b>Meu Studio</b><small>Personal Training</small></span>
+    </a>
+    <a class="btn btn-main btn-sm js-wa" href="#contato" data-msg="Olá! Quero agendar uma aula no Meu Studio.">Agendar aula</a>
+  </div>
+</header>
+
+<div class="bpm" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.4C.9 8 3.1 4 6.9 4c2.2 0 3.6 1.2 5.1 3 1.5-1.8 2.9-3 5.1-3 3.8 0 6 4 4.5 7.6C19.5 16.4 12 21 12 21Z"/></svg>
+  <b id="bpmNum">60</b>
+  <small>BPM</small>
+</div>
+
+<main>
+  <section class="hero" id="inicio">
+    <div class="stick" id="stick">
+      <h1 class="sr">Meu Studio Personal Training</h1>
+      <canvas id="fx" aria-hidden="true"></canvas>
+      <div class="caps">
+        <div class="cap on"><p>O caminho pode ser tão bonito quanto a chegada.</p></div>
+        <div class="cap"><p>Treino feito para você, com um profissional do seu lado do começo ao fim.</p></div>
+        <div class="cap"><p>Sem fila. Sem ficha copiada. Sem multidão.</p></div>
+        <div class="cap"><p>Seu treino, seu ritmo.</p><a class="btn btn-main js-wa" href="#contato" data-msg="Olá! Vim pelo site e quero começar meu caminho no Meu Studio.">Começar meu caminho</a></div>
+      </div>
+      <div class="ticks" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="hint" id="hint" aria-hidden="true"><span></span>Role para começar</div>
+    </div>
+  </section>
+
+  <div class="journey" id="journey">
+    <svg class="trail" id="trail" aria-hidden="true">
+      <defs>
+        <radialGradient id="dotg"><stop offset="0" stop-color="#ffd9b8"/><stop offset=".35" stop-color="#ffa04a"/><stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/></radialGradient>
+      </defs>
+      <path class="base" id="trBase"/>
+      <path class="halo" id="trHalo"/>
+      <path class="lit" id="trLit"/>
+      <circle id="dotHalo" r="22" fill="url(#dotg)" opacity=".55"/>
+      <circle id="dot" r="5" fill="#ffe3c9"/>
+    </svg>
+
+    <section class="intro" id="intro">
+      <div class="jw">
+        <p class="l rv">Seu coração<br>já <span>começou.</span></p>
+        <p class="r rv" style="--d:1">A partir daqui, cada batida é um passo. <b>E o caminho é todo seu.</b></p>
+      </div>
+    </section>
+
+    <section class="sec" id="servicos">
+      <div class="jw">
+        <span class="lbl rv">Serviços</span>
+        <h2 class="h2 rv" style="--d:1">Um treino<br>com a <em>sua cara.</em></h2>
+        <div class="cards">
+          <article class="card rv" style="--d:2">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="16" cy="13" r="5"/><circle cx="32" cy="13" r="5"/><path d="M7 38c1.2-7 4.8-11 9-11s7.8 4 9 11M23 38c1.2-7 4.8-11 9-11s7.8 4 9 11"/></svg>
+            <h3>Treino 1 a 1</h3>
+            <p>Atenção total do começo ao fim. Um profissional olhando só para você, corrigindo cada movimento e ajustando cada carga.</p>
+          </article>
+          <article class="card rv" style="--d:3">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="17" width="38" height="14" rx="3"/><path d="M12 17v6M19 17v4M26 17v6M33 17v4M40 17v6"/></svg>
+            <h3>Sob medida</h3>
+            <p>Nada de ficha copiada. O treino é montado para o seu corpo, a sua rotina e o seu objetivo.</p>
+          </article>
+          <article class="card rv" style="--d:4">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="12" r="5"/><path d="M15 40c1.3-8 4.8-13 9-13s7.7 5 9 13"/><path d="M5 40h38"/></svg>
+            <h3>Sem multidão</h3>
+            <p>Treine sem fila e sem pressa, num espaço onde o único foco é você.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="avaliacoes">
+      <div class="jw">
+        <span class="lbl rv">Avaliações</span>
+        <h2 class="h2 rv" style="--d:1">Quem treina, <em>aprova.</em></h2>
+        <div class="stats">
+          <div class="stat rv" style="--d:2"><b id="cRate">5,0</b><span class="st" aria-label="cinco estrelas">★★★★★</span><p>Nota no Google</p></div>
+          <div class="stat rv" style="--d:3"><b id="cCount">46</b><p>Avaliações reais</p></div>
+          <div class="stat rv" style="--d:4"><b>1 a 1</b><p>Atenção total em cada aula</p></div>
+        </div>
+        <p class="note rv" style="--d:5">Números do nosso perfil público. <a href="https://www.google.com/maps/search/?api=1&amp;query=Meu+Studio+Personal+Training+Florian%C3%B3polis" target="_blank" rel="noopener">Ver avaliações no Google</a></p>
+      </div>
+    </section>
+
+    <section class="sec contact" id="contato">
+      <div class="jw">
+        <div class="finish rv" id="finish" aria-hidden="true"><i></i></div>
+        <span class="lbl rv">Contato</span>
+        <h2 class="h2 rv" style="--d:1">Comece o seu <em>caminho hoje.</em></h2>
+        <p class="t rv" style="--d:2">Mande uma mensagem, conte o seu objetivo e marque a sua primeira aula. O resto a gente faz junto.</p>
+        <a class="btn btn-main rv js-wa" style="--d:3" href="#contato" data-msg="Olá! Vim pelo site e quero marcar minha primeira aula no Meu Studio.">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3Z"/></svg>
+          Falar no WhatsApp
+        </a>
+        <p class="sig rv" style="--d:4">Seu treino, seu ritmo.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="jw">
+    <a class="logo" href="#inicio"><span class="ms" aria-hidden="true">MS</span><b>Meu Studio Personal Training</b></a>
+    <span class="q">O caminho pode ser tão bonito quanto a chegada.</span>
+    <span>Florianópolis, SC · © 2026</span>
+  </div>
+</footer>
+
+<script>
+/* Número do WhatsApp: DDI + DDD + número, só dígitos. Exemplo: 5547999999999
+   Deixe vazio ("") para os botões levarem à seção de contato. */
+const WA = "5548992091676";
+
+(function () {
+  "use strict";
+  document.documentElement.classList.add("js");
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const root = document.documentElement;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ---------- WhatsApp ---------- */
+  const waOk = /^\d{10,15}$/.test(WA);
+  document.querySelectorAll(".js-wa").forEach(a => {
+    if (!waOk) { a.setAttribute("href", "#contato"); return; }
+    a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(a.dataset.msg || "Olá!");
+    a.target = "_blank";
+    a.rel = "noopener";
+  });
+
+  /* ---------- Carregamento: o anel enche como um download ---------- */
+  (function () {
+    const el = document.getElementById("loader"), bar = document.getElementById("ldbar"),
+          pct = document.getElementById("ldpct"), msg = document.getElementById("ldmsg");
+    const msgs = [[0, "Preparando o seu caminho"], [35, "Ajustando as cargas"], [70, "Aquecendo os aparelhos"], [96, "Bem vindo ao Meu Studio"]];
+    const dur = reduce ? 400 : 2400;
+    let start = null, loaded = document.readyState === "complete", finished = false;
+    addEventListener("load", () => { loaded = true; });
+    setTimeout(() => { loaded = true; }, 4000);
+    function step(ts) {
+      if (start === null) start = ts;
+      let p = Math.min(1, (ts - start) / dur);
+      p = 1 - Math.pow(1 - p, 2.2);
+      if (!loaded) p = Math.min(p, .9);
+      const v = Math.round(p * 100);
+      bar.style.strokeDashoffset = 1 - p;
+      pct.textContent = v;
+      for (const [t, m] of msgs) if (v >= t) msg.textContent = m;
+      if (v < 100) requestAnimationFrame(step);
+      else if (!finished) { finished = true; setTimeout(() => el.classList.add("done"), 250); }
+    }
+    requestAnimationFrame(step);
+  })();
+
+  /* ---------- Estado de rolagem ---------- */
+  let sy = scrollY, vh = innerHeight;
+  addEventListener("scroll", () => { sy = scrollY; }, { passive: true });
+
+  /* ---------- Batimento ---------- */
+  const bpmNum = document.getElementById("bpmNum");
+  let bpm = 60, phase = 0, pulse = 0, lastBpmShown = 60;
+  const pulseEls = [...document.querySelectorAll(".btn-main, .bpm, .bgglow, .finish")];
+  function gauss(t, c, s) {
+    let d = t - c;
+    if (d > .5) d -= 1; else if (d < -.5) d += 1;
+    return Math.exp(-(d * d) / (2 * s * s));
+  }
+  function heartbeat(dt) {
+    const max = Math.max(1, document.documentElement.scrollHeight - vh);
+    const target = 60 + 100 * clamp(sy / max, 0, 1);
+    bpm += (target - bpm) * Math.min(1, dt / 400);
+    const shown = Math.round(bpm);
+    if (shown !== lastBpmShown) { bpmNum.textContent = shown; lastBpmShown = shown; }
+    if (reduce) { pulse = 0; return; }
+    phase = (phase + dt / 1000 * bpm / 60) % 1;
+    pulse = Math.min(1, gauss(phase, 0, .035) + .62 * gauss(phase, .17, .04));
+    const pv = pulse.toFixed(3);
+    for (const el of pulseEls) el.style.setProperty("--pulse", pv);
+  }
+
+  /* ---------- Partículas ---------- */
+  const hero = document.querySelector(".hero");
+  const stick = document.getElementById("stick");
+  const cv = document.getElementById("fx");
+  const ctx = cv.getContext("2d");
+  const caps = [...document.querySelectorAll(".cap")];
+  const ticks = [...document.querySelectorAll(".ticks i")];
+  const hint = document.getElementById("hint");
+
+  let W = 0, H = 0, dpr = 1, N = 0, mobile = false;
+  let X, Y, VX, VY, F, S, SEED;
+  let shapes = null;            // array de Float32Array com os destinos
+  let layouts = [];             // letras sólidas das formas de texto
+  const SHAPE_OF = [0, 1, 1, 2]; // etapa da rolagem -> forma (logo, halter, halter, frase)
+  let shapeAt = 0, textAlpha = 0;
+  let stage = 0, heroVisible = true, glow = null, cx = 0, cy = 0;
+  const COLORS = ["#ff5a1f", "#ffa04a", "#ffd9b8"];
+  let cut1 = 0, cut2 = 0;       // divisões de cor por índice
+  let embers = [];
+  const ptr = { x: 0, y: 0, on: false };
+  let fontsReady = false, staticDirty = true;
+  let Z, VZ, sprites = [];
+  const ext = document.createElement("canvas"), ectx = ext.getContext("2d");
+  const cam = { ry: 0, rx: 0, zoom: 1, tx: 0, ty: 0 };
+  let heroTop = 0, heroScroll = 1, hpS = 0;
+
+  function alloc() {
+    N = mobile ? 1700 : 3200;
+    X = new Float32Array(N); Y = new Float32Array(N);
+    VX = new Float32Array(N); VY = new Float32Array(N);
+    F = new Float32Array(N); S = new Float32Array(N); SEED = new Float32Array(N);
+    Z = new Float32Array(N); VZ = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      X[i] = Math.random() * W; Y[i] = Math.random() * H;
+      S[i] = (mobile ? 1.05 : .95) + Math.random() * (mobile ? 1.05 : 1.1);
+      SEED[i] = Math.random() * Math.PI * 2;
+    }
+    cut1 = Math.floor(N * .58); cut2 = Math.floor(N * .92);
+    const E = mobile ? 50 : 110;
+    embers = [];
+    for (let i = 0; i < E; i++) embers.push(newEmber(true));
+  }
+  function newEmber(anywhere) {
+    return {
+      x: Math.random() * W, y: anywhere ? Math.random() * H : H + 10,
+      vy: -(.35 + Math.random() * 1.1), seed: Math.random() * 6.28,
+      life: 0, max: 200 + Math.random() * 260, s: .8 + Math.random() * 1.8
+    };
+  }
+
+  function size() {
+    const r = stick.getBoundingClientRect();
+    const nw = Math.round(r.width), nh = Math.round(r.height);
+    const wasMobile = mobile;
+    W = nw; H = nh; mobile = W < 760;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    heroTop = hero.offsetTop; heroScroll = Math.max(1, hero.offsetHeight - innerHeight);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ext.width = Math.ceil(cv.width / 2); ext.height = Math.ceil(cv.height / 2);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = "#0a0707"; ctx.fillRect(0, 0, W, H);
+    if (!X || wasMobile !== mobile) alloc();
+    const box = shapeBox();
+    cx = box.x + box.w / 2; cy = box.y + box.h / 2;
+    glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .62);
+    glow.addColorStop(0, "rgba(255,90,31,.55)");
+    glow.addColorStop(.45, "rgba(255,90,31,.12)");
+    glow.addColorStop(1, "rgba(255,90,31,0)");
+    if (fontsReady) buildShapes();
+    staticDirty = true;
+  }
+
+  function shapeBox() {
+    const top = 84;
+    const bottomSpace = mobile ? 250 : Math.max(200, H * .27);
+    const h = Math.max(140, H - top - bottomSpace);
+    const w = W * (mobile ? .9 : .84);
+    return { x: (W - w) / 2, y: top, w, h };
+  }
+
+  /* desenha as formas num canvas invisível e amostra os pixels */
+  function buildShapes() {
+    const sc = mobile ? .75 : .5;
+    const ow = Math.max(1, Math.round(W * sc)), oh = Math.max(1, Math.round(H * sc));
+    const oc = document.createElement("canvas");
+    oc.width = ow; oc.height = oh;
+    const o = oc.getContext("2d", { willReadFrequently: true });
+    const b = shapeBox();
+    const box = { x: b.x * sc, y: b.y * sc, w: b.w * sc, h: b.h * sc };
+    const wide = W / H > 1.05;
+    layouts = [];
+    const draws = [
+      () => text(o, box, ["MEU", "STUDIO"], 0, sc),
+      () => dumbbell(o, box, sc),
+      () => text(o, box, wide ? ["SEU RITMO"] : ["SEU", "RITMO"], 2, sc)
+    ];
+    shapes = draws.map(fn => {
+      o.clearRect(0, 0, ow, oh);
+      o.fillStyle = "#fff";
+      fn();
+      return sample(o, ow, oh, sc);
+    });
+    buildSprites();
+    staticDirty = true;
+  }
+
+  function text(o, box, lines, si, sc) {
+    o.textAlign = "center"; o.textBaseline = "alphabetic";
+    o.font = "100px Anton, Impact, sans-serif";
+    let mw = 0;
+    lines.forEach(l => { mw = Math.max(mw, o.measureText(l).width); });
+    const m = o.measureText("M");
+    const asc = (m.actualBoundingBoxAscent || 74) / 100;
+    const n = lines.length, gapR = .2;
+    const byW = box.w * .96 / mw * 100;
+    const byH = box.h * .96 / (asc * (n + (n - 1) * gapR));
+    const fs = Math.min(byW, byH);
+    o.font = fs + "px Anton, Impact, sans-serif";
+    const capH = asc * fs, gap = capH * gapR;
+    const total = n * capH + (n - 1) * gap;
+    let y = box.y + (box.h - total) / 2;
+    const lay = { fs: fs / sc, capH: capH / sc, lines: [] };
+    lines.forEach(l => {
+      y += capH; o.fillText(l, box.x + box.w / 2, y);
+      lay.lines.push({ t: l, x: (box.x + box.w / 2) / sc, y: y / sc });
+      y += gap;
+    });
+    layouts[si] = lay;
+  }
+
+  function rr(o, x, y, w, h, r) {
+    o.beginPath();
+    if (o.roundRect) o.roundRect(x, y, w, h, r); else o.rect(x, y, w, h);
+    o.fill();
+  }
+  function dumbbell(o, box, sc) {
+    const u = Math.min(box.w / 8.4, box.h / 3.6);
+    const x0 = box.x + box.w / 2, y0 = box.y + box.h / 2;
+    layouts[1] = { bell: true, u: u / sc, x0: x0 / sc, y0: y0 / sc };
+    bellParts(o, x0, y0, u);
+  }
+  function bellParts(o, x0, y0, u) {
+    rr(o, x0 - 3.9 * u, y0 - .2 * u, 7.8 * u, .4 * u, .1 * u);
+    for (const s of [-1, 1]) {
+      rr(o, x0 + s * 1.95 * u - .12 * u, y0 - .45 * u, .24 * u, .9 * u, .06 * u);
+      rr(o, x0 + s * 2.4 * u - .3 * u, y0 - 1.6 * u, .6 * u, 3.2 * u, .14 * u);
+      rr(o, x0 + s * 3.02 * u - .24 * u, y0 - 1.22 * u, .48 * u, 2.44 * u, .12 * u);
+      rr(o, x0 + s * 3.6 * u - .16 * u, y0 - .5 * u, .32 * u, 1 * u, .08 * u);
+    }
+  }
+  function sample(o, ow, oh, sc) {
+    const d = o.getImageData(0, 0, ow, oh).data;
+    const pts = [];
+    for (let y = 0; y < oh; y++) for (let x = 0; x < ow; x++) if (d[(y * ow + x) * 4 + 3] > 128) pts.push(x, y);
+    const count = pts.length / 2;
+    const out = new Float32Array(N * 2);
+    if (!count) { for (let i = 0; i < N; i++) { out[2 * i] = cx; out[2 * i + 1] = cy; } return out; }
+    const idx = new Uint32Array(count);
+    for (let i = 0; i < count; i++) idx[i] = i;
+    for (let i = 0; i < N; i++) {
+      let k;
+      if (i < count) { const j = i + Math.floor(Math.random() * (count - i)); k = idx[j]; idx[j] = idx[i]; idx[i] = k; }
+      else k = idx[Math.floor(Math.random() * count)];
+      out[2 * i] = (pts[2 * k] + Math.random()) / sc;
+      out[2 * i + 1] = (pts[2 * k + 1] + Math.random()) / sc;
+    }
+    return out;
+  }
+
+  function setStage(s) {
+    if (s === stage) return;
+    const sameShape = SHAPE_OF[s] === SHAPE_OF[stage];
+    stage = s;
+    caps.forEach((c, i) => c.classList.toggle("on", i === s));
+    ticks.forEach((t, i) => t.classList.toggle("on", i <= s));
+    staticDirty = true;
+    if (sameShape) return;
+    shapeAt = performance.now();
+    if (reduce) return;
+    for (let i = 0; i < N; i++) {
+      const a = Math.atan2(Y[i] - cy, X[i] - cx) + (Math.random() - .5) * 1.4;
+      const sp = 4 + Math.random() * 13;
+      VX[i] += Math.cos(a) * sp; VY[i] += Math.sin(a) * sp;
+      VZ[i] += (Math.random() - .5) * sp * 2.4;
+      F[i] = 14 + Math.random() * 30;
+    }
+  }
+
+  function stepParticles(dt, t) {
+    const k = dt / 16.67;
+    const T = shapes ? shapes[SHAPE_OF[stage]] : null;
+    const bx = Math.cos(cam.ry) * cam.zoom * (1 + pulse * .015), by = Math.cos(cam.rx) * cam.zoom * (1 + pulse * .015);
+    const R = mobile ? 72 : 110, R2 = R * R;
+    for (let i = 0; i < N; i++) {
+      let vx = VX[i], vy = VY[i];
+      if (T) {
+        const tx = cx + (T[2 * i] - cx) * bx + Math.sin(t * .0018 + SEED[i]) * .6;
+        const ty = cy + (T[2 * i + 1] - cy) * by + Math.cos(t * .0016 + SEED[i]) * .6;
+        const free = F[i] > 0;
+        const sk = free ? .006 : .055;
+        vx += (tx - X[i]) * sk * k; vy += (ty - Y[i]) * sk * k;
+        VZ[i] = (VZ[i] - Z[i] * sk * k) * Math.pow(free ? .94 : .82, k); Z[i] += VZ[i] * k;
+        const damp = Math.pow(free ? .94 : .82, k);
+        vx *= damp; vy *= damp;
+        if (free) F[i] -= k;
+      } else {
+        vx += (Math.random() - .5) * .12 * k; vy += (Math.random() - .5) * .12 * k - .004 * k;
+        const damp = Math.pow(.985, k); vx *= damp; vy *= damp;
+      }
+      if (ptr.on) {
+        const dx = X[i] - ptr.x, dy = Y[i] - ptr.y, d2 = dx * dx + dy * dy;
+        if (d2 < R2 && d2 > .01) {
+          const d = Math.sqrt(d2); let f = 1 - d / R; f *= f;
+          const nx = dx / d, ny = dy / d;
+          vx += (nx * 5 - ny * 2.2) * f * k;
+          vy += (ny * 5 + nx * 2.2 - .7) * f * k;
+        }
+      }
+      VX[i] = vx; VY[i] = vy;
+      X[i] += vx * k; Y[i] += vy * k;
+      if (!T) { if (X[i] < 0) X[i] += W; else if (X[i] > W) X[i] -= W; if (Y[i] < 0) Y[i] += H; else if (Y[i] > H) Y[i] -= H; }
+    }
+    for (let e = 0; e < embers.length; e++) {
+      const m = embers[e];
+      m.life += k; m.y += m.vy * k; m.x += Math.sin(t * .001 + m.seed) * .35 * k;
+      if (m.life > m.max || m.y < -10) embers[e] = newEmber(false);
+    }
+  }
+
+  function render(t) {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = reduce ? "#0a0707" : "rgba(10,7,7,.32)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = reduce ? .3 : .1 + pulse * .22;
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+    const lay = shapes ? layouts[SHAPE_OF[stage]] : null;
+    const want = lay && (reduce || t - shapeAt > 900) ? 1 : 0;
+    textAlpha = reduce ? want : textAlpha + (want - textAlpha) * (want ? .06 : .25);
+    const sp = shapes ? sprites[SHAPE_OF[stage]] : null;
+    if (sp && textAlpha > .01) draw3D(sp, textAlpha);
+    ctx.globalCompositeOperation = "lighter";
+    const grow = 1 + pulse * .45;
+    const T = shapes ? shapes[SHAPE_OF[stage]] : null;
+    const ranges = [[0, cut1, .85], [cut1, cut2, .8], [cut2, N, .9]];
+    const dotsA = 1 - textAlpha; // some com o brilho quando as letras acendem
+    for (let c = 0; c < 3 && dotsA > .02; c++) {
+      ctx.fillStyle = COLORS[c]; ctx.globalAlpha = ranges[c][2] * dotsA;
+      for (let i = ranges[c][0]; i < ranges[c][1]; i++) {
+        const s = S[i] * grow;
+        if (reduce && T) { ctx.fillRect(T[2 * i] - s / 2, T[2 * i + 1] - s / 2, s, s); continue; }
+        const zz = 700 + Z[i];
+        if (zz < 80) continue;
+        const f = 700 / zz, ss = s * f;
+        ctx.fillRect(cx + (X[i] - cx) * f - ss / 2, cy + (Y[i] - cy) * f - ss / 2, ss, ss);
+      }
+    }
+    if (!reduce) {
+      ctx.fillStyle = COLORS[1];
+      for (const m of embers) {
+        const a = Math.sin(m.life / m.max * Math.PI) * (.55 + .45 * Math.sin(t * .02 + m.seed));
+        ctx.globalAlpha = clamp(a, 0, 1) * .8;
+        ctx.fillRect(m.x, m.y, m.s, m.s);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+
+  /* ---------- 3D: cada forma vira um bloco laranja com profundidade ---------- */
+  function fillShape(o, lay, style) {
+    o.fillStyle = style;
+    if (lay.bell) { bellParts(o, lay.x0, lay.y0, lay.u); return; }
+    o.font = lay.fs + "px Anton, Impact, sans-serif";
+    o.textAlign = "center"; o.textBaseline = "alphabetic";
+    lay.lines.forEach(l => o.fillText(l.t, l.x, l.y));
+  }
+  function buildSprites() {
+    const b = shapeBox(), pad = 60, w = b.w + pad * 2, h = b.h + pad * 2;
+    const mk = q => {
+      const c = document.createElement("canvas"), r = dpr * q;
+      c.width = Math.ceil(w * r); c.height = Math.ceil(h * r);
+      const o = c.getContext("2d");
+      o.setTransform(r, 0, 0, r, r * (pad - b.x), r * (pad - b.y));
+      return [c, o];
+    };
+    sprites = layouts.map(lay => {
+      if (!lay) return null;
+      const [face, fo] = mk(1), [side, so] = mk(.5), [glw, go] = mk(.3);
+      const g = fo.createLinearGradient(0, b.y, 0, b.y + b.h);
+      g.addColorStop(0, "#ffb066"); g.addColorStop(.5, "#ff7a34"); g.addColorStop(1, "#ff5a1f");
+      fillShape(fo, lay, g);
+      const sg = so.createLinearGradient(0, b.y, 0, b.y + b.h);
+      sg.addColorStop(0, "#b4400f"); sg.addColorStop(1, "#5e1c06");
+      fillShape(so, lay, sg);
+      go.shadowColor = "rgba(255,90,31,.95)";
+      go.shadowBlur = 34 * dpr * .3;
+      go.shadowOffsetX = 10000 * dpr * .3;
+      go.translate(-10000, 0);
+      fillShape(go, lay, "#ff5a1f");
+      return { face, side, glow: glw, w, h, ox: b.x - pad, oy: b.y - pad };
+    });
+  }
+  function blit(sp, img, ox, oy, sx, sy) {
+    ctx.setTransform(dpr * sx, 0, 0, dpr * sy, dpr * (cx + ox), dpr * (cy + oy));
+    ctx.drawImage(img, sp.ox - cx, sp.oy - cy, sp.w, sp.h);
+  }
+  function draw3D(sp, a) {
+    const z = cam.zoom * (1 + pulse * .02);
+    const sx = Math.cos(cam.ry) * z, sy = Math.cos(cam.rx) * z;
+    const D = (mobile ? 18 : 30) * z, L = mobile ? 7 : 10;
+    const dx = Math.sin(cam.ry) * D, dy = -Math.sin(cam.rx) * D;
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = a * (.35 + .6 * pulse);
+    blit(sp, sp.glow, dx * .5, dy * .5, sx * 1.02, sy * 1.02);
+    /* a lateral é montada em meia resolução e ampliada de uma vez */
+    const hd = dpr / 2;
+    ectx.setTransform(1, 0, 0, 1, 0, 0);
+    ectx.clearRect(0, 0, ext.width, ext.height);
+    for (let j = L; j >= 1; j--) {
+      const f = j / L, sh = 1 - .04 * f;
+      ectx.setTransform(hd * sx * sh, 0, 0, hd * sy * sh, hd * (cx + dx * f), hd * (cy + dy * f));
+      ectx.drawImage(sp.side, sp.ox - cx, sp.oy - cy, sp.w, sp.h);
+    }
+    ctx.globalAlpha = a;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(ext, 0, 0, cv.width, cv.height);
+    blit(sp, sp.face, 0, 0, sx, sy);
+    ctx.restore();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  /* a rolagem gira e aproxima a forma; o ponteiro inclina */
+  const ease = x => 1 - Math.pow(1 - x, 3);
+  function camera(hp, dt, t) {
+    if (reduce) { cam.ry = cam.rx = 0; cam.zoom = 1; return; }
+    const kk = Math.min(1, dt / 120);
+    hpS += (hp - hpS) * kk;
+    const sf = hpS * 4, si = SHAPE_OF[Math.min(3, Math.floor(sf))];
+    const seg = [[0, 1], [1, 3], [3, 4]][si];
+    const lp = clamp((sf - seg[0]) / (seg[1] - seg[0]), 0, 1);
+    const turn = si === 0 ? -lp * .6 : (lp - .5) * .9;
+    const zoom = 1 + .1 * Math.sin(lp * Math.PI);
+    const intro = ease(clamp((t - shapeAt - 600) / 1300, 0, 1));
+    const spin = (1 - intro) * (si === 1 ? -.9 : .9);
+    const tx = ptr.on ? clamp((ptr.x - cx) / W, -.5, .5) * .7 : 0;
+    const ty = ptr.on ? clamp((ptr.y - cy) / H, -.5, .5) * .5 : 0;
+    cam.tx += (tx - cam.tx) * kk; cam.ty += (ty - cam.ty) * kk;
+    cam.ry = clamp(turn + spin + cam.tx + Math.sin(t * .0007) * .06, -1.05, 1.05);
+    cam.rx = clamp(Math.sin(t * .0005) * .05 - cam.ty, -.6, .6);
+    cam.zoom = zoom;
+  }
+
+  /* cartões inclinam em 3D sob o mouse */
+  if (!reduce && matchMedia("(hover: hover)").matches) {
+    document.querySelectorAll(".card").forEach(c => {
+      c.addEventListener("pointerenter", () => { c.style.transition = "transform .15s ease-out, border-color .3s ease"; });
+      c.addEventListener("pointermove", e => {
+        const r = c.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+        c.style.transform = `perspective(800px) rotateY(${px * 14}deg) rotateX(${-py * 14}deg) translateZ(12px)`;
+      });
+      c.addEventListener("pointerleave", () => { c.style.transition = "transform .6s ease, border-color .3s ease"; c.style.transform = ""; });
+    });
+  }
+
+  /* ponteiro: mouse e toque */
+  function setPtr(clientX, clientY) {
+    const r = cv.getBoundingClientRect();
+    ptr.x = clientX - r.left; ptr.y = clientY - r.top; ptr.on = true;
+  }
+  stick.addEventListener("pointermove", e => { if (e.pointerType !== "touch") setPtr(e.clientX, e.clientY); }, { passive: true });
+  stick.addEventListener("pointerleave", () => { ptr.on = false; }, { passive: true });
+  stick.addEventListener("touchstart", e => { const t = e.touches[0]; if (t) setPtr(t.clientX, t.clientY); }, { passive: true });
+  stick.addEventListener("touchmove", e => { const t = e.touches[0]; if (t) setPtr(t.clientX, t.clientY); }, { passive: true });
+  stick.addEventListener("touchend", () => { ptr.on = false; }, { passive: true });
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(es => { heroVisible = es[0].isIntersecting; }, { rootMargin: "40px" }).observe(hero);
+  }
+
+  /* ---------- Trilha ---------- */
+  const journey = document.getElementById("journey");
+  const svg = document.getElementById("trail");
+  const pBase = document.getElementById("trBase"), pHalo = document.getElementById("trHalo"), pLit = document.getElementById("trLit");
+  const dot = document.getElementById("dot"), dotHalo = document.getElementById("dotHalo");
+  const finish = document.getElementById("finish");
+  const secs = [...journey.querySelectorAll("section")];
+  let secTops = [];
+  let LEN = 0, LX = null, LY = null, LYmax = null, jTop = 0, jW = 0;
+
+  function ecg(d, x0, y0, y1, beats, A) {
+    const seg = (y1 - y0) / beats;
+    for (let b = 0; b < beats; b++) {
+      const yb = y0 + b * seg;
+      d.push(`L${x0} ${yb + seg * .30}`,
+        `Q${x0 + A * .2} ${yb + seg * .34} ${x0} ${yb + seg * .38}`,
+        `L${x0} ${yb + seg * .44}`,
+        `L${x0 - A * .16} ${yb + seg * .46}`,
+        `L${x0 + A} ${yb + seg * .50}`,
+        `L${x0 - A * .45} ${yb + seg * .54}`,
+        `L${x0} ${yb + seg * .57}`,
+        `L${x0} ${yb + seg * .66}`,
+        `Q${x0 + A * .34} ${yb + seg * .74} ${x0} ${yb + seg * .82}`);
+    }
+    d.push(`L${x0} ${y1}`);
+  }
+  function wiggle(d, x, y0, y1, amp, period) {
+    let y = y0, s = 1;
+    const n = Math.max(1, Math.round((y1 - y0) / period));
+    const hp = (y1 - y0) / n;
+    for (let i = 0; i < n; i++) {
+      d.push(`C${x + amp * s} ${y + hp * .35} ${x + amp * s} ${y + hp * .65} ${x} ${y + hp}`);
+      y += hp; s = -s;
+    }
+  }
+  function swing(d, x1, y1, x2, y2) {
+    const m = y1 + (y2 - y1) * .5;
+    d.push(`C${x1} ${m} ${x2} ${m} ${x2} ${y2}`);
+  }
+
+  function buildTrail() {
+    jW = journey.clientWidth;
+    const jH = journey.scrollHeight;
+    svg.setAttribute("width", jW); svg.setAttribute("height", jH);
+    svg.setAttribute("viewBox", `0 0 ${jW} ${jH}`);
+    const jr = journey.getBoundingClientRect();
+    jTop = jr.top + scrollY;
+    const [intro, svc, rev, con] = secs;
+    const fr = finish.getBoundingClientRect();
+    const fx = fr.left - jr.left + fr.width / 2, fy = fr.top - jr.top + fr.height / 2;
+    const lane = jW < 1180;
+    const d = [];
+    if (lane) {
+      const x = 26;
+      d.push(`M${x} 0`);
+      ecg(d, x, 0, intro.offsetTop + intro.offsetHeight - 20, 3, 15);
+      wiggle(d, x, intro.offsetTop + intro.offsetHeight - 20, fy - 150, 9, 200);
+      swing(d, x, fy - 150, fx, fy);
+    } else {
+      const g = (jW - 1000) / 2, L = g / 2, R = jW - g / 2, cxm = jW / 2;
+      const iEnd = intro.offsetTop + intro.offsetHeight - 30;
+      d.push(`M${cxm} 0`);
+      ecg(d, cxm, 0, iEnd, 3, 64);
+      const sTop = svc.offsetTop + 70, sBot = svc.offsetTop + svc.offsetHeight - 60;
+      const rTop = rev.offsetTop + 70, rBot = rev.offsetTop + rev.offsetHeight - 60;
+      swing(d, cxm, iEnd, L, sTop);
+      wiggle(d, L, sTop, sBot, 22, 220);
+      swing(d, L, sBot, R, rTop);
+      wiggle(d, R, rTop, rBot, 22, 220);
+      swing(d, R, rBot, fx, fy);
+    }
+    const ds = d.join(" ");
+    pBase.setAttribute("d", ds); pHalo.setAttribute("d", ds); pLit.setAttribute("d", ds);
+    LEN = pBase.getTotalLength();
+    const n = Math.min(4000, Math.max(200, Math.ceil(LEN / 5)));
+    secTops = secs.map(s => s.offsetTop);
+    LX = new Float32Array(n + 1); LY = new Float32Array(n + 1); LYmax = new Float32Array(n + 1);
+    let mx = -Infinity;
+    for (let i = 0; i <= n; i++) {
+      const p = pBase.getPointAtLength(LEN * i / n);
+      LX[i] = p.x; LY[i] = p.y; mx = Math.max(mx, p.y); LYmax[i] = mx;
+    }
+    [pLit, pHalo].forEach(p => p.style.strokeDasharray = `${LEN} ${LEN}`);
+    trailDirty = true;
+  }
+
+  let trailDirty = true, lastSy = -1, countersDone = false;
+  function updateTrail() {
+    if (!LX) return;
+    if (sy === lastSy && !trailDirty) return;
+    lastSy = sy; trailDirty = false;
+    const target = sy + vh * .58 - jTop;
+    const n = LX.length - 1;
+    let lo = 0, hi = n;
+    if (target <= 0) hi = 0;
+    else if (target >= LYmax[n]) lo = hi = n;
+    else {
+      while (lo < hi) { const m = (lo + hi) >> 1; if (LYmax[m] < target) lo = m + 1; else hi = m; }
+    }
+    const i = hi, L = LEN * i / n;
+    pLit.style.strokeDashoffset = LEN - L;
+    pHalo.style.strokeDashoffset = LEN - L;
+    dot.setAttribute("cx", LX[i]); dot.setAttribute("cy", LY[i]);
+    dotHalo.setAttribute("cx", LX[i]); dotHalo.setAttribute("cy", LY[i]);
+    finish.classList.toggle("arrived", i >= n - 2);
+    const dy = LY[i];
+    secs.forEach((s, k) => {
+      if (s.classList.contains("lit")) return;
+      const top = secTops[k];
+      if (dy >= top - 40 || jTop + top - sy < vh * .72) {
+        s.classList.add("lit");
+        if (s.id === "avaliacoes" && !countersDone) { countersDone = true; runCounters(); }
+      }
+    });
+  }
+
+  /* ---------- Contadores ---------- */
+  const cRate = document.getElementById("cRate"), cCount = document.getElementById("cCount");
+  if (!reduce) { cRate.textContent = "0,0"; cCount.textContent = "0"; }
+  function runCounters() {
+    if (reduce) return;
+    const t0 = performance.now(), dur = 1600;
+    (function tick(now) {
+      const p = clamp((now - t0) / dur, 0, 1), e = 1 - Math.pow(1 - p, 3);
+      cRate.textContent = (5 * e).toFixed(1).replace(".", ",");
+      cCount.textContent = Math.round(46 * e);
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  /* ---------- Laço principal ---------- */
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(64, now - last); last = now;
+    heartbeat(dt);
+
+    const hp = clamp((sy - heroTop) / heroScroll, 0, 1);
+    setStage(Math.min(3, Math.floor(hp * 4)));
+    hint.style.opacity = hp > .03 ? 0 : 1;
+    if (heroVisible) camera(hp, dt, now);
+
+    if (heroVisible) {
+      if (reduce) { if (staticDirty) { render(now); staticDirty = false; } }
+      else { stepParticles(dt, now); render(now); }
+    }
+
+    updateTrail();
+    if (!reduce) {
+      dotHalo.setAttribute("r", 16 + pulse * 18);
+      dot.setAttribute("r", 4.5 + pulse * 2);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- Início ---------- */
+  size();
+  buildTrail();
+  let rT = 0, lastW = innerWidth, lastH = innerHeight;
+  addEventListener("resize", () => {
+    clearTimeout(rT);
+    rT = setTimeout(() => {
+      vh = innerHeight;
+      heroTop = hero.offsetTop; heroScroll = Math.max(1, hero.offsetHeight - vh);
+      const big = innerWidth !== lastW || Math.abs(innerHeight - lastH) > 120;
+      lastW = innerWidth; lastH = innerHeight;
+      if (big) size();
+      buildTrail();
+    }, 150);
+  });
+  if ("ResizeObserver" in window) new ResizeObserver(() => buildTrail()).observe(journey);
+
+  const fontWait = document.fonts && document.fonts.load
+    ? Promise.race([document.fonts.load('400 100px "Anton"'), new Promise(r => setTimeout(r, 3000))])
+    : Promise.resolve();
+  fontWait.catch(() => {}).then(() => {
+    fontsReady = true;
+    buildShapes();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildTrail);
+  });
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
